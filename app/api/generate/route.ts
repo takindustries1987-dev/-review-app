@@ -30,12 +30,14 @@ interface GenerateRequest {
 }
 
 // =============================================================================
-// OpenAI クライアント
+// OpenAI クライアント（遅延初期化）
 // =============================================================================
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient(): OpenAI {
+    return new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+    });
+}
 
 // =============================================================================
 // プロンプト生成
@@ -138,6 +140,7 @@ export async function POST(request: NextRequest) {
         const prompt = buildPrompt(requestData);
 
         // OpenAI API呼び出し
+        const openai = getOpenAIClient();
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
