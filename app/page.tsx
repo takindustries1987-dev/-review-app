@@ -24,6 +24,9 @@ interface Store {
 
 type TagCategory = 'good' | 'normal' | 'bad';
 
+// 「特になし」の特別なタグ名
+const NONE_TAG = '__NONE__';
+
 // =============================================================================
 // タグ選択コンポーネント
 // =============================================================================
@@ -34,7 +37,9 @@ function TagSelector({
   color,
   tags,
   selectedTags,
+  isNoneSelected,
   onToggle,
+  onNoneToggle,
   disabledTags,
 }: {
   label: string;
@@ -42,7 +47,9 @@ function TagSelector({
   color: 'green' | 'gray' | 'red';
   tags: TagData[];
   selectedTags: string[];
+  isNoneSelected: boolean;
   onToggle: (tagName: string) => void;
+  onNoneToggle: () => void;
   disabledTags: string[];
 }) {
   const colorClasses = {
@@ -52,6 +59,8 @@ function TagSelector({
       header: 'bg-emerald-100 text-emerald-800',
       selected: 'bg-emerald-500 text-white border-emerald-500',
       unselected: 'bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-50',
+      noneSelected: 'bg-emerald-200 text-emerald-800 border-emerald-400',
+      noneUnselected: 'bg-white text-emerald-600 border-emerald-300 hover:bg-emerald-50',
     },
     gray: {
       bg: 'bg-gray-50',
@@ -59,6 +68,8 @@ function TagSelector({
       header: 'bg-gray-100 text-gray-700',
       selected: 'bg-gray-500 text-white border-gray-500',
       unselected: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100',
+      noneSelected: 'bg-gray-300 text-gray-800 border-gray-400',
+      noneUnselected: 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100',
     },
     red: {
       bg: 'bg-rose-50',
@@ -66,6 +77,8 @@ function TagSelector({
       header: 'bg-rose-100 text-rose-800',
       selected: 'bg-rose-500 text-white border-rose-500',
       unselected: 'bg-white text-rose-700 border-rose-300 hover:bg-rose-50',
+      noneSelected: 'bg-rose-200 text-rose-800 border-rose-400',
+      noneUnselected: 'bg-white text-rose-600 border-rose-300 hover:bg-rose-50',
     },
   };
 
@@ -79,9 +92,21 @@ function TagSelector({
       </div>
       <div className="p-4">
         <div className="flex flex-wrap gap-2">
+          {/* 「特になし」ボタン */}
+          <button
+            onClick={onNoneToggle}
+            className={`
+              px-4 py-2 rounded-full border text-sm font-medium transition-all cursor-pointer
+              ${isNoneSelected ? classes.noneSelected : classes.noneUnselected}
+            `}
+          >
+            特になし
+          </button>
+
+          {/* 通常のタグボタン */}
           {tags.map((tag) => {
             const isSelected = selectedTags.includes(tag.tagName);
-            const isDisabled = disabledTags.includes(tag.tagName);
+            const isDisabled = disabledTags.includes(tag.tagName) || isNoneSelected;
 
             return (
               <button
@@ -126,6 +151,11 @@ function ReviewContent() {
   const [goodTags, setGoodTags] = useState<string[]>([]);
   const [normalTags, setNormalTags] = useState<string[]>([]);
   const [badTags, setBadTags] = useState<string[]>([]);
+
+  // 「特になし」選択状態（普通と改善点はデフォルトで選択）
+  const [goodNone, setGoodNone] = useState(false);
+  const [normalNone, setNormalNone] = useState(true); // デフォルトで選択
+  const [badNone, setBadNone] = useState(true); // デフォルトで選択
 
   // プロフィール
   const [userGender, setUserGender] = useState<string>('');
@@ -184,12 +214,45 @@ function ReviewContent() {
       normal: setNormalTags,
       bad: setBadTags,
     };
+    const noneSetters = {
+      good: setGoodNone,
+      normal: setNormalNone,
+      bad: setBadNone,
+    };
     const current = { good: goodTags, normal: normalTags, bad: badTags }[category];
 
-    if (current.includes(tagName)) {
-      setters[category](current.filter((t) => t !== tagName));
-    } else {
+    // タグを選択する場合、「特になし」を解除
+    if (!current.includes(tagName)) {
+      noneSetters[category](false);
       setters[category]([...current, tagName]);
+    } else {
+      setters[category](current.filter((t) => t !== tagName));
+    }
+  };
+
+  // 「特になし」のトグル処理
+  const toggleNone = (category: TagCategory) => {
+    const noneStates = { good: goodNone, normal: normalNone, bad: badNone };
+    const noneSetters = {
+      good: setGoodNone,
+      normal: setNormalNone,
+      bad: setBadNone,
+    };
+    const tagSetters = {
+      good: setGoodTags,
+      normal: setNormalTags,
+      bad: setBadTags,
+    };
+
+    const currentNone = noneStates[category];
+
+    if (!currentNone) {
+      // 「特になし」を選択 → 他のタグをすべてクリア
+      noneSetters[category](true);
+      tagSetters[category]([]);
+    } else {
+      // 「特になし」を解除
+      noneSetters[category](false);
     }
   };
 
@@ -205,9 +268,14 @@ function ReviewContent() {
   const generateReview = async () => {
     if (!store) return;
 
-    const totalTags = goodTags.length + normalTags.length + badTags.length;
+    // 「特になし」が選択されている場合は空配列として送信
+    const sendGoodTags = goodNone ? [] : goodTags;
+    const sendNormalTags = normalNone ? [] : normalTags;
+    const sendBadTags = badNone ? [] : badTags;
+
+    const totalTags = sendGoodTags.length + sendNormalTags.length + sendBadTags.length;
     if (totalTags === 0) {
-      setError('少なくとも1つのタグを選択してください');
+      setError('少なくとも1つのタグを選択してください（全て「特になし」はできません）');
       return;
     }
 
@@ -222,9 +290,9 @@ function ReviewContent() {
         body: JSON.stringify({
           storeName: store.name,
           storeCategory: store.category,
-          goodTags,
-          normalTags,
-          badTags,
+          goodTags: sendGoodTags,
+          normalTags: sendNormalTags,
+          badTags: sendBadTags,
           userGender: userGender || undefined,
           userAge: userAge || undefined,
           visitFrequency: visitFrequency || undefined,
@@ -260,6 +328,9 @@ function ReviewContent() {
     setGoodTags([]);
     setNormalTags([]);
     setBadTags([]);
+    setGoodNone(false);
+    setNormalNone(true);
+    setBadNone(true);
     setGeneratedReview('');
     setError(null);
   };
@@ -284,7 +355,11 @@ function ReviewContent() {
     );
   }
 
-  const totalSelected = goodTags.length + normalTags.length + badTags.length;
+  // 送信用のタグ数（「特になし」の場合は0）
+  const effectiveGoodCount = goodNone ? 0 : goodTags.length;
+  const effectiveNormalCount = normalNone ? 0 : normalTags.length;
+  const effectiveBadCount = badNone ? 0 : badTags.length;
+  const totalSelected = effectiveGoodCount + effectiveNormalCount + effectiveBadCount;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -304,7 +379,7 @@ function ReviewContent() {
         {/* 説明 */}
         <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 text-sm text-blue-800">
           <p className="font-medium mb-1">📝 正直なレビューを作成</p>
-          <p>各カテゴリから当てはまるものを選んでください。選択した内容のみがレビューに反映されます。</p>
+          <p>各カテゴリから当てはまるものを選んでください。該当しない場合は「特になし」を選択してください。</p>
         </div>
 
         {/* タグ選択エリア */}
@@ -315,7 +390,9 @@ function ReviewContent() {
             color="green"
             tags={store?.selectableTags || []}
             selectedTags={goodTags}
+            isNoneSelected={goodNone}
             onToggle={(tag) => toggleTag('good', tag)}
+            onNoneToggle={() => toggleNone('good')}
             disabledTags={getDisabledTags('good')}
           />
 
@@ -325,7 +402,9 @@ function ReviewContent() {
             color="gray"
             tags={store?.selectableTags || []}
             selectedTags={normalTags}
+            isNoneSelected={normalNone}
             onToggle={(tag) => toggleTag('normal', tag)}
+            onNoneToggle={() => toggleNone('normal')}
             disabledTags={getDisabledTags('normal')}
           />
 
@@ -335,7 +414,9 @@ function ReviewContent() {
             color="red"
             tags={store?.selectableTags || []}
             selectedTags={badTags}
+            isNoneSelected={badNone}
             onToggle={(tag) => toggleTag('bad', tag)}
+            onNoneToggle={() => toggleNone('bad')}
             disabledTags={getDisabledTags('bad')}
           />
         </div>
@@ -392,22 +473,26 @@ function ReviewContent() {
         </details>
 
         {/* 選択状況サマリー */}
-        {totalSelected > 0 && (
-          <div className="flex items-center justify-between rounded-xl bg-white border border-gray-200 px-4 py-3">
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">{totalSelected}</span> 個のタグを選択中
-              {goodTags.length > 0 && <span className="ml-2 text-emerald-600">😊{goodTags.length}</span>}
-              {normalTags.length > 0 && <span className="ml-2 text-gray-500">😐{normalTags.length}</span>}
-              {badTags.length > 0 && <span className="ml-2 text-rose-600">😔{badTags.length}</span>}
-            </div>
-            <button
-              onClick={resetSelection}
-              className="text-sm text-gray-400 hover:text-gray-600"
-            >
-              リセット
-            </button>
+        <div className="flex items-center justify-between rounded-xl bg-white border border-gray-200 px-4 py-3">
+          <div className="text-sm text-gray-600">
+            {totalSelected > 0 ? (
+              <>
+                <span className="font-medium">{totalSelected}</span> 個のタグを選択中
+                {effectiveGoodCount > 0 && <span className="ml-2 text-emerald-600">😊{effectiveGoodCount}</span>}
+                {effectiveNormalCount > 0 && <span className="ml-2 text-gray-500">😐{effectiveNormalCount}</span>}
+                {effectiveBadCount > 0 && <span className="ml-2 text-rose-600">😔{effectiveBadCount}</span>}
+              </>
+            ) : (
+              <span className="text-gray-400">タグを選択してください</span>
+            )}
           </div>
-        )}
+          <button
+            onClick={resetSelection}
+            className="text-sm text-gray-400 hover:text-gray-600"
+          >
+            リセット
+          </button>
+        </div>
 
         {/* 生成ボタン */}
         <button
