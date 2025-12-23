@@ -1,0 +1,18 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "review-app",
+    "main": ".open-next/worker.js",
+    "compatibility_date": "2024-09-23",
+    "compatibility_flags": [
+        "nodejs_compat"
+    ],
+    "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS"
+    },
+    "vars": {
+        "NEXT_PUBLIC_SHEET_URL": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnffrfQMVoVjzQ0sLQjNDfiL1RdgUW2XmYoxcdl7amDUZnRnG87bLTkWu0DCpsO-_u2E6Y2j9xV3m7/pub?output=csv",
+        "NEXT_PUBLIC_CATEGORY_TAGS_SHEET_GID": "1709518251",
+        "USAGE_LOG_WEBHOOK_URL": "https://script.google.com/macros/s/AKfycbzuz86UEIS3amCvOELaLAA0B8jm8Kgqkvcg2zyPwBp-AET-HU2UlHQbeSOAa89f5ud-kQ/exec"
+    }
+}

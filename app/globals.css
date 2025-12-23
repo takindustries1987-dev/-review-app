@@ -1,26 +1,266 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap');
+
+/* ==============================================
+   Modern Euro-Dining Design System
+   ============================================== */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base Colors */
+  --background: #F8F9FA;
+  --foreground: #1A202C;
+
+  /* Primary Palette */
+  --navy: #1A202C;
+  --navy-light: #2D3748;
+  --charcoal: #4A5568;
+
+  /* Accent Colors */
+  --gold: #C9A962;
+  --gold-light: #E8D5A3;
+  --terracotta: #C77B58;
+
+  /* Surface Colors */
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* Keep light mode for this app */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #F8F9FA;
+    --foreground: #1A202C;
   }
+}
+
+/* ==============================================
+   Base Styles
+   ============================================== */
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-feature-settings: 'palt';
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==============================================
+   Custom Scrollbar
+   ============================================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EDF2F7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #A0AEC0;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--charcoal);
+}
+
+/* ==============================================
+   Component Styles (using CSS, no @apply)
+   ============================================== */
+
+/* Language Selector Pills */
+.lang-pill {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  background: white;
+  color: #4A5568;
+  flex-shrink: 0;
+}
+
+.lang-pill:hover:not(.active) {
+  background: #F7FAFC;
+}
+
+.lang-pill.active {
+  background: var(--navy);
+  color: white;
+}
+
+/* Tag Buttons */
+.tag-button {
+  padding: 0.625rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #F7FAFC;
+  color: #374151;
+}
+
+.tag-button:hover:not(.selected):not(:disabled) {
+  background: #EDF2F7;
+  border-color: #CBD5E0;
+}
+
+.tag-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.tag-button.selected {
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
+}
+
+.tag-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Card Styles */
+.card {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #F3F4F6;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Generate Button */
+.btn-generate {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  transition: all 0.3s ease-out;
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  box-shadow: 0 4px 14px 0 rgba(26, 32, 44, 0.25);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-generate:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(26, 32, 44, 0.35);
+}
+
+.btn-generate:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Copy Button */
+.btn-copy {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  color: white;
+  transition: all 0.2s;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--terracotta) 100%);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-copy:hover {
+  opacity: 0.9;
+}
+
+/* Result Card */
+.result-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  border: 2px solid var(--gold-light);
+  box-shadow: 0 4px 20px rgba(201, 169, 98, 0.1);
+}
+
+/* Text Selection */
+::selection {
+  background: var(--gold-light);
+  color: var(--navy);
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 100;
+}
+
+/* Hide scrollbar for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

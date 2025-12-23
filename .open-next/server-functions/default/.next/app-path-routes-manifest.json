@@ -1,0 +1,8 @@
+{
+  "/api/store/route": "/api/store",
+  "/api/debug/route": "/api/debug",
+  "/favicon.ico/route": "/favicon.ico",
+  "/_not-found/page": "/_not-found",
+  "/page": "/",
+  "/api/generate/route": "/api/generate"
+}
