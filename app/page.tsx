@@ -460,10 +460,7 @@ function TagSection({
           onClick={onNoneToggle}
           className={`
             tag-button
-            ${isNoneSelected
-              ? `${colors.selected} text-white selected`
-              : `bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100`
-            }
+            ${isNoneSelected ? `selected ${colors.selected}` : ''}
           `}
         >
           {noneText}
@@ -482,10 +479,7 @@ function TagSection({
               disabled={isDisabled}
               className={`
                 tag-button
-                ${isSelected
-                  ? `${colors.selected} text-white selected`
-                  : `bg-gray-50 text-gray-700 border-gray-200`
-                }
+                ${isSelected ? `selected ${colors.selected}` : ''}
               `}
               title={tag.context}
             >
