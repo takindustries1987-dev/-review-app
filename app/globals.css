@@ -110,32 +110,25 @@ body {
   color: white;
 }
 
-/* Tag Buttons - High specificity to override Tailwind */
-button.tag-button,
+/* Tag Buttons */
 .tag-button {
   padding: 0.625rem 1rem;
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
-  border: 1px solid #E2E8F0 !important;
+  border: 1px solid #E2E8F0;
   cursor: pointer;
   min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #F7FAFC !important;
-  color: #1f2937 !important;
-}
-
-button.tag-button:not(.selected),
-.tag-button:not(.selected) {
-  background-color: #F7FAFC !important;
-  color: #1f2937 !important;
+  background-color: #F7FAFC;
+  color: #374151;
 }
 
 .tag-button:hover:not(.selected):not(:disabled) {
-  background: #EDF2F7;
+  background-color: #EDF2F7;
   border-color: #CBD5E0;
 }
 
@@ -143,31 +136,32 @@ button.tag-button:not(.selected),
   transform: scale(0.95);
 }
 
+/* Selected states with explicit backgrounds */
 .tag-button.selected {
-  border-color: transparent !important;
-  color: white !important;
+  border-color: transparent;
+  color: #ffffff !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transform: scale(1.05);
 }
 
-/* Selected state backgrounds for each color scheme */
-.tag-button.selected.bg-emerald-600 {
+.tag-button.tag-selected-success {
   background-color: #059669 !important;
 }
 
-.tag-button.selected.bg-gray-500 {
+.tag-button.tag-selected-neutral {
   background-color: #6B7280 !important;
 }
 
-.tag-button.selected.bg-amber-600 {
+.tag-button.tag-selected-warning {
   background-color: #D97706 !important;
 }
 
+/* Disabled state - visible but muted */
 .tag-button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-  color: #6B7280 !important;
-  background-color: #F3F4F6 !important;
+  background-color: #F3F4F6;
+  color: #6B7280;
 }
 
 /* Card Styles */

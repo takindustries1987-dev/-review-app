@@ -413,17 +413,17 @@ function TagSection({
     success: {
       iconBg: 'bg-emerald-50',
       iconColor: 'text-emerald-600',
-      selected: 'bg-emerald-600',
+      selected: 'tag-selected-success',
     },
     neutral: {
       iconBg: 'bg-gray-100',
       iconColor: 'text-gray-500',
-      selected: 'bg-gray-500',
+      selected: 'tag-selected-neutral',
     },
     warning: {
       iconBg: 'bg-amber-50',
       iconColor: 'text-amber-600',
-      selected: 'bg-amber-600',
+      selected: 'tag-selected-warning',
     },
   };
 
